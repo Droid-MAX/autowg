@@ -111,7 +111,7 @@ def main():
     parser.add_argument('--pool', help='IPv6 prefix to assign to clients', required=True)
     parser.add_argument('--route', help='IPv6 route to push to clients', required=True)
     parser.add_argument('--endpoint', help='Wireguard endpoint (host/ip, port ist inferred)', required=True)
-    parser.add_argument('--http-host', help='HTTP host to listen on', default='')
+    parser.add_argument('--http-host', help='HTTP host to listen on', default='0.0.0.0')
     parser.add_argument('--http-port', type=int, help='HTTP port to listen on', default=3000)
     parser.add_argument('--http-prefix', help='HTTP URL prefix', default='/')
     parser.add_argument('--cn-pattern', help='Regex to extract the peer name from the CN', default='([0-9a-zA-Z]+)')
