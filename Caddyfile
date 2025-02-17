@@ -1,0 +1,12 @@
+vpn.example.com {
+	tls {
+		client_auth {
+			mode verify_if_given
+			trusted_ca_cert_file /opt/vpn/device-ca.pem
+		}
+	}
+
+	reverse_proxy /vpn/* localhost:3000 {
+		header_up X-Client-Subject "{http.request.tls.client.subject}"
+	}
+}
