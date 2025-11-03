@@ -73,10 +73,18 @@ class RequestHandler(BaseHTTPRequestHandler):
         pubkey = ''
         ip = None
         try:
-            pubkey = payload.decode('ascii')
-            ip = TUNNEL.set_peer(cn, pubkey)
+            payload = payload.decode('ascii')
 
-            logging.info('registered peer "%s" (IP: %s) with pubkey "%s"' % (cn, ip, pubkey))
+            lines = payload.split('\n')
+            pubkey = lines[0]
+
+            psk = None
+            if len(lines) > 1:
+                psk = lines[1]
+
+            ip = TUNNEL.set_peer(cn, pubkey, psk=psk)
+
+            logging.info('registered peer "%s" (IP: %s) with pubkey "%s", psk=%s' % (cn, ip, pubkey, psk is not None))
         except:
             logging.error('failed to process client request from "%s" with payload "%s"' % (cn, payload), exc_info=sys.exc_info())
             self.send_error(HTTPStatus.INTERNAL_SERVER_ERROR)
