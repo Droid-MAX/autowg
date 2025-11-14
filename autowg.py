@@ -138,7 +138,8 @@ class Tunnel:
             "last_handshake": last_handshake,
             "ip": ip,
             "rx_bytes": peer.rx_bytes,
-            "tx_bytes": peer.tx_bytes
+            "tx_bytes": peer.tx_bytes,
+            "using_psk": bool(peer.preshared_key)
         }
 
     def peerstats(self, name: str) -> Optional[Dict[str, Any]]:
