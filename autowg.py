@@ -5,7 +5,7 @@ import re
 import time
 from typing import Any, Dict, Optional
 
-from wgnlpy import PublicKey, WireGuard
+from wgnlpy import PublicKey, PresharedKey, WireGuard
 
 class NameConverter(ABC):
     @abstractmethod
@@ -91,24 +91,30 @@ class Tunnel:
             'pubkey': str(self.pubkey)
         }
 
-    def set_peer(self, name: str, pubkey: str) -> str:
+    def set_peer(self, name: str, pubkey: str, psk: Optional[str] = None) -> str:
         addr = self.converter.convert(self.prefix, name)
         pk = PublicKey(pubkey)
 
+        if psk is not None:
+            psk = PresharedKey(psk)
+
         if name in self.peers:
             old_key = self.peers[name]['pk']
+            old_psk = self.peers[name]['psk']
 
-            if old_key == pk:
+            if old_key == pk and old_psk == psk:
                 return str(addr)
 
             self.wg.remove_peers(self.interface, old_key)
             del self.key_to_name[old_key]
 
         self.wg.set_peer(self.interface, pk,
-                         replace_allowedips=True, allowedips=[addr])
+                         replace_allowedips=True, allowedips=[addr],
+                         preshared_key=psk)
 
         self.peers[name] = {
             'pk': pk,
+            'psk': psk,
             'created': int(time.time())
         }
 
@@ -132,7 +138,8 @@ class Tunnel:
             "last_handshake": last_handshake,
             "ip": ip,
             "rx_bytes": peer.rx_bytes,
-            "tx_bytes": peer.tx_bytes
+            "tx_bytes": peer.tx_bytes,
+            "using_psk": bool(peer.preshared_key)
         }
 
     def peerstats(self, name: str) -> Optional[Dict[str, Any]]:

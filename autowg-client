@@ -86,10 +86,12 @@ then
 	setup_interface "$ifname"
 fi
 
-pubkey=$(wg show "$ifname" public-key)
-
 log "[.] (re-)registering"
-cfg=$(curl -m 3 -sS -d "$pubkey" -E "/factory/device.crt" --key "/factory/device.key" "$api_endpoint")
+
+pubkey=$(wg show "$ifname" public-key)
+psk=$(wg genpsk)
+
+cfg=$(curl -m 3 -sS -d "$(echo -ne "$pubkey\n$psk")" -E "/factory/device.crt" --key "/factory/device.key" "$api_endpoint")
 
 isverbose && log  "config is:"
 isverbose && log  "-----------------"
@@ -102,7 +104,8 @@ wg set "$ifname" \
 	peer "$(get_cfg "$cfg" "pubkey")" \
 	endpoint "$(get_cfg "$cfg" "endpoint")" \
 	persistent-keepalive "$(get_cfg_default "$cfg" "keepalive" 25)" \
-	allowed-ips "$(get_cfg "$cfg" "route")"
+	allowed-ips "$(get_cfg "$cfg" "route")" \
+	preshared-key <(echo "$psk")
 
 ip -6 addr flush dev "$ifname"
 ip -6 addr add "$(get_cfg "$cfg" "ip")" dev "$ifname"
