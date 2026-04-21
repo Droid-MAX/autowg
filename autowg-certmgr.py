@@ -94,6 +94,9 @@ def create_server_cert(server_name, dns_names, ip_addresses, ca_cert, ca_key, ou
         dns_list = [d.strip() for d in dns_names.split(',') if d.strip()]
         ip_list = [ip.strip() for ip in ip_addresses.split(',') if ip.strip()]
 
+        if server_name not in dns_list:
+            dns_list.insert(0, server_name)
+
         config_lines = [
             "[req]",
             "distinguished_name = req_distinguished_name",
@@ -417,7 +420,7 @@ def main():
                         help="Certificate validity in days (default: 365)")
     parser.add_argument("--server-name", default="localhost",
                         help="Server name for server certificate (default: localhost)")
-    parser.add_argument("--dns-names", default="localhost,vpn.example.com",
+    parser.add_argument("--dns-names", default="localhost",
                         help="DNS names for server SAN (comma-separated)")
     parser.add_argument("--ip-addresses", default="127.0.0.1",
                         help="IP addresses for server SAN (comma-separated)")
