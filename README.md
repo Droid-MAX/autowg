@@ -2,7 +2,7 @@
 
 autowg is an opinionated tool for managing a zero-effort WireGuard VPN for a fleet of devices that only assumes the existence of a per-device TLS client certificate signed by some central CA.
 
-autowg runs on the VPN concentrator and devices register with the VPN through an HTTPS endpoint, authenticated and identified by their TLS client certificate. autowg assings an IPv6 address to the device and adds a corresponding peer to the WireGuard interface.
+autowg runs on the VPN concentrator and devices register with the VPN through an HTTPS endpoint, authenticated and identified by their TLS client certificate. autowg assigns an IPv6 address to the device and adds a corresponding peer to the WireGuard interface.
 
 No persistent state is kept on either end - a device is free to rejoin the VPN with a different WireGuard pubkey at any point in time, so it can just generate a fresh key on every reboot, for example. Similarly, autowg will clean out all of the peers that use a IP address prefix that it manages from the WireGuard interface upon startup. Devices are expected to re-register as needed (for example by checking if the WireGuard "last handshake" timer has expired).
 
